@@ -1120,10 +1120,12 @@ static int __ref update_offline_cores(int val)
 {
 	uint32_t cpu = 0;
 	int ret = 0;
+	uint32_t previous_cpus_offlined = 0;
 
 	if (!core_control_enabled)
 		return 0;
 
+	previous_cpus_offlined = msm_thermal_info.cpus_offlined;
 	cpus_offlined = msm_thermal_info.core_control_mask & val;
 
 	for_each_possible_cpu(cpu) {
@@ -1146,8 +1148,6 @@ static int __ref update_offline_cores(int val)
 		else if (ret)
 			pr_err("Unable to online CPU%d. err:%d\n",
 					cpu, ret);
-		else
-			pr_debug("Onlined CPU%d\n", cpu);
 		}
 	}
 	return ret;
