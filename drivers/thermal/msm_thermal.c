@@ -1139,42 +1139,27 @@ static int msm_thermal_suspend_callback(
 /* Call with core_control_mutex locked */
 static int __ref update_offline_cores(int val)
 {
-	uint32_t cpu = 0;
-	int ret = 0;
-	uint32_t previous_cpus_offlined = 0;
+       uint32_t cpu = 0;
+       int ret = 0;
 
-	if (!core_control_enabled)
-		return 0;
+       if (!core_control_enabled)
+               return 0;
 
-	previous_cpus_offlined = msm_thermal_info.cpus_offlined;
-	cpus_offlined = msm_thermal_info.core_control_mask & val;
+       cpus_offlined = msm_thermal_info.core_control_mask & val;
 
-	for_each_possible_cpu(cpu) {
-		if (cpus_offlined & BIT(cpu))) {
-			if (!cpu_online(cpu))
-				continue;
-			ret = cpu_down(cpu);
-			if (ret)
-				pr_err("Unable to offline CPU%d. err:%d\n",
-					cpu, ret);
-			else
-				pr_debug("Offlined CPU%d\n", cpu);
-		} else if (online_core && (previous_cpus_offlined & BIT(cpu))) {
-			if (cpu_online(cpu))
-				continue;
-			ret = cpu_up(cpu);
-			if (ret && ret == notifier_to_errno(NOTIFY_BAD)) {
-				pr_debug("Onlining CPU%d is vetoed\n", cpu);
-			} else if (ret) {
-				cpus_offlined |= BIT(cpu);
-				pr_err("Unable to online CPU%d. err:%d\n",
-					cpu, ret);
-			} else {
-				pr_debug("Onlined CPU%d\n", cpu);
-			}
-		}
-	}
-	return ret;
+       for_each_possible_cpu(cpu) {
+               if (!(cpus_offlined & BIT(cpu)))
+                       continue;
+               if (!cpu_online(cpu))
+                       continue;
+               ret = cpu_down(cpu);
+               if (ret)
+                       pr_err("Unable to offline CPU%d. err:%d\n",
+                               cpu, ret);
+               else
+                       pr_debug("Offlined CPU%d\n", cpu);
+       }
+       return ret;
 }
 
 static __ref int do_hotplug(void *data)
@@ -1706,6 +1691,8 @@ static __ref int do_freq_mitigation(void *data)
 {
 	int ret = 0;
 	uint32_t cpu = 0, max_freq_req = 0, min_freq_req = 0;
+	long temp = 0;
+	bool skip_mitig = false;
 	struct sched_param param = {.sched_priority = MAX_RT_PRIO-1};
 
 	sched_setscheduler(current, SCHED_FIFO, &param);
