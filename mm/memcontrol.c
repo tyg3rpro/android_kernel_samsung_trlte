@@ -1828,6 +1828,7 @@ static void mem_cgroup_out_of_memory(struct mem_cgroup *memcg, gfp_t gfp_mask,
 					put_task_struct(chosen);
 				return;
 			case OOM_SCAN_OK:
+			case OOM_SCAN_SKIP_SEARCH_THREAD:
 				break;
 			};
 			points = oom_badness(task, memcg, NULL, totalpages);
