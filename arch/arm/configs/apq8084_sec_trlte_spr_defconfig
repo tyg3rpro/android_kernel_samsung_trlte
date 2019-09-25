@@ -266,7 +266,7 @@ CONFIG_CGROUP_CPUSET=y
 CONFIG_CGROUP_BFQIO=y
 CONFIG_MEMCG=y
 
-#Added for Wifi
+#Added for Ping (Modifying some kernel files needed)
 CONFIG_SECURITY_ANDROID_GID_CAPABILITIES=y
 
 
