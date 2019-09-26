@@ -147,13 +147,12 @@ static int hci_smd_close(struct hci_dev *hdev)
 		return -EPERM;
 }
 
-#if 0
+
 static void hci_smd_destruct(struct hci_dev *hdev)
 {
 	if (NULL != hdev->driver_data)
 		kfree(hdev->driver_data);
 }
-#endif
 
 static void hci_smd_recv_data(void)
 {
@@ -190,7 +189,7 @@ static void hci_smd_recv_data(void)
 	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
 	skb_orphan(skb);
 
-	rc = hci_recv_frame(hsmd->hdev, skb);
+	rc = hci_recv_frame(skb);
 	if (rc < 0) {
 		BT_ERR("Error in passing the packet to HCI Layer");
 		/*
@@ -249,7 +248,7 @@ static void hci_smd_recv_event(void)
 
 		skb_orphan(skb);
 
-		rc = hci_recv_frame(hsmd->hdev, skb);
+		rc = hci_recv_frame(skb);
 		if (rc < 0) {
 			BT_ERR("Error in passing the packet to HCI Layer");
 			/*
@@ -275,7 +274,7 @@ out_event:
 		kfree_skb(skb);
 }
 
-static int hci_smd_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+static int hci_smd_send_frame(struct sk_buff *skb)
 {
 	int len;
 	int avail;
@@ -491,7 +490,7 @@ static int hci_smd_register_smd(struct hci_smd_data *hsmd)
 	hdev->open  = hci_smd_open;
 	hdev->close = hci_smd_close;
 	hdev->send  = hci_smd_send_frame;
-	//hdev->destruct = hci_smd_destruct;
+	hdev->destruct = hci_smd_destruct;
 	hdev->owner = THIS_MODULE;
 
 
@@ -675,4 +674,4 @@ module_exit(hci_smd_exit);
 
 MODULE_AUTHOR("Ankur Nandwani <ankurn@codeaurora.org>");
 MODULE_DESCRIPTION("Bluetooth SMD driver");
-MODULE_LICENSE("GPL v2"); 
+MODULE_LICENSE("GPL v2");
