@@ -6,6 +6,7 @@ ifeq ($(CONFIG_GPIO_PCAL6416A),y)
     EXTRA_CFLAGS += -DUSE_GPIO_EXPANDER_BT_EN
 endif
 
+obj-$(CONFIG_BT_HCISMD)		+= hci_smd.o
 obj-$(CONFIG_BT_HCIVHCI)	+= hci_vhci.o
 obj-$(CONFIG_BT_HCIUART)	+= hci_uart.o
 obj-$(CONFIG_BT_HCIBCM203X)	+= bcm203x.o
